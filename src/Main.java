@@ -5,8 +5,6 @@ import java.util.Random;
 
 /**
  * Genererador de ficheros de laberintos de prueba para la práctica de IASI
- * <p>
- * TODO Permitir elegir ampliaciones
  *
  * @author Juan Pablo García Plaza Pérez
  */
@@ -67,7 +65,7 @@ public class Main {
                 laberintos[i].setTeletransportes(nTP);
                 laberintos[i].setObstaculos(nObs);
             }
-            try (FileWriter fileWriter = new FileWriter(new File(dir + "/laberinto" + i + ".txt"))) {
+            try (FileWriter fileWriter = new FileWriter(new File(dir + "/laberinto" + i + ".lab"))) {
                 fileWriter.write(laberintos[i].toString());
             } catch (IOException e) {
                 e.printStackTrace();
