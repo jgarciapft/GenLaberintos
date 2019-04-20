@@ -11,39 +11,36 @@ import java.util.Random;
 
 public class Main {
 
-    public static final char CHAR_SEP = ',';
-    public static final String CHAR_OBSTACULO = "▓";
-    public static final String CHAR_TELETRASNPORTE = "◙";
+    private static final char CHAR_SEP = ',';
+    private static final String CHAR_OBSTACULO = "A";
 
     /**
      * @param args Parámetros:
      *             1. Valor umbral para todos los laberintos _umbral_. No puede ser negativo (0 >= umbral)
      *             2. Dimensión del laberinto _D_. Debe ser mayor que 1 (D > 1)
      *             3. Número de salidas _nSal_. Debe ser mayor que 0 y menor que la dimensión al cuadrado (0 > nSal >= D²)
-     *             4. Número de parejas de teletransportes _nTP_. Debe ser mayor o igual que 0 y menor o igual que la mitad
      *             de la dimensión al cuadrado (0 >= nTP >= D²/2)
-     *             5. Número de obstáculos _nObs_. Debe ser mayor o igual que 0 y menor o igual que la dimensión de al cuadrado
+     *             4. Número de obstáculos _nObs_. Debe ser mayor o igual que 0 y menor o igual que la dimensión de al cuadrado
      *             (0 > nSal >= D²)
-     *             6. Número de ficheros de laberinto a generar. Debe ser mayor que 0
-     *             7. Nombre del directorio donde guardar los ficheros de laberinto
-     *             8. Si se desen incluir las características de las ampliaciones (0 -> No, 1 -> Sí)
+     *             5. Número de ficheros de laberinto a generar. Debe ser mayor que 0
+     *             6. Nombre del directorio donde guardar los ficheros de laberinto
+     *             7. Si se desen incluir las características de las ampliaciones (0 -> False, 1 -> True)
      *             <p>
-     *             NOTA: La suma de (nSal + nTP*2 + nObs) no debe superar la dimensión al cuadrado
-     *             nSal + nTP*2 + nObs >= D²
+     *             NOTA: La suma de (nSal + nObs) no debe superar la dimensión al cuadrado
+     *             nSal + nObs >= D²
      */
     public static void main(String[] args) {
-        int umbral, D, nSal, nTP, nObs, nFicheros;
+        int umbral, D, nSal, nObs, nFicheros;
         boolean ampliaciones;
         String dir;
 
         umbral = Integer.parseInt(args[0]);
         D = Integer.parseInt(args[1]);
         nSal = Integer.parseInt(args[2]);
-        nTP = Integer.parseInt(args[3]);
-        nObs = Integer.parseInt(args[4]);
-        nFicheros = Integer.parseInt(args[5]);
-        dir = args[6];
-        ampliaciones = Boolean.parseBoolean(args[7]);
+        nObs = Integer.parseInt(args[3]);
+        nFicheros = Integer.parseInt(args[4]);
+        dir = args[5];
+        ampliaciones = Boolean.parseBoolean(args[6]);
 
         // Crea la colección de laberintos generados
         Laberinto[] laberintos = new Laberinto[nFicheros];
@@ -51,7 +48,8 @@ public class Main {
 
         // Crea la carpeta si no existe
         File carpeta = new File(dir);
-        if (!carpeta.exists()) carpeta.mkdir();
+        if (!carpeta.exists()) //noinspection ResultOfMethodCallIgnored
+            carpeta.mkdir();
 
         for (int i = 0; i < laberintos.length; i++) {
             laberintos[i] = new Laberinto(D, umbral);
@@ -61,10 +59,8 @@ public class Main {
                 }
             }
             laberintos[i].setSalidas(nSal);
-            if (ampliaciones) {
-                laberintos[i].setTeletransportes(nTP);
+            if (ampliaciones)
                 laberintos[i].setObstaculos(nObs);
-            }
             try (FileWriter fileWriter = new FileWriter(new File(dir + "/laberinto" + i + ".lab"))) {
                 fileWriter.write(laberintos[i].toString());
             } catch (IOException e) {
@@ -78,33 +74,29 @@ public class Main {
         int umbral;
         private String[][] laberinto;
 
-        public Laberinto(int D, int umbral) {
+        Laberinto(int D, int umbral) {
             this.D = D;
             this.umbral = umbral;
             laberinto = new String[D][D];
         }
 
-        public int getD() {
+        int getD() {
             return D;
         }
 
-        public int getUmbral() {
+        int getUmbral() {
             return umbral;
         }
 
-        public void setUmbral(int umbral) {
-            this.umbral = umbral;
-        }
-
-        public String getValor(int i, int j) {
+        String getValor(int i, int j) {
             return laberinto[i][j];
         }
 
-        public void setValor(int i, int j, String valor) {
+        void setValor(int i, int j, String valor) {
             laberinto[i][j] = valor;
         }
 
-        public void setSalidas(int nSal) {
+        void setSalidas(int nSal) {
             Random random = new Random(System.nanoTime());
             int iIdx;
             int jIdx;
@@ -117,24 +109,7 @@ public class Main {
             }
         }
 
-        public void setTeletransportes(int nTP) {
-            Random random = new Random(System.nanoTime());
-            int iIdx;
-            int jIdx;
-
-            for (int i = 1; i <= nTP; i++) {
-                for (int j = 0; j < 2; j++) {
-                    iIdx = random.nextInt(getD() - 1) + 1;
-                    jIdx = random.nextInt(getD() - 1) + 1;
-                    if (!getValor(iIdx, jIdx).equals(CHAR_TELETRASNPORTE) &&
-                            !getValor(iIdx, jIdx).equals("0"))
-                        setValor(iIdx, jIdx, i + CHAR_TELETRASNPORTE);
-                    else j--;
-                }
-            }
-        }
-
-        public void setObstaculos(int nObs) {
+        void setObstaculos(int nObs) {
             Random random = new Random(System.nanoTime());
             int iIdx;
             int jIdx;
@@ -143,7 +118,6 @@ public class Main {
                 iIdx = random.nextInt(getD() - 1) + 1;
                 jIdx = random.nextInt(getD() - 1) + 1;
                 if (!getValor(iIdx, jIdx).equals(CHAR_OBSTACULO) &&
-                        !getValor(iIdx, jIdx).matches("\\d\\" + CHAR_TELETRASNPORTE) &&
                         !getValor(iIdx, jIdx).equals("0"))
                     setValor(iIdx, jIdx, CHAR_OBSTACULO);
                 else i--;
