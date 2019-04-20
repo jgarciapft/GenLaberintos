@@ -12,7 +12,7 @@ import java.util.Random;
 public class Main {
 
     private static final char CHAR_SEP = ',';
-    private static final String CHAR_OBSTACULO = "A";
+    private static final String CHAR_OBSTACULO = "*";
 
     /**
      * @param args Parámetros:
